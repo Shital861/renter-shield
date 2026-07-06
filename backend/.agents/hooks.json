@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "python3 .agents/scripts/validate_tool_call.py",
+        "timeout": 10,
+        "tools": ["run_command"]
+      },
+      {
+        "type": "command",
+        "command": "python3 .agents/scripts/validate_pii_boundary.py",
+        "timeout": 5,
+        "tools": ["draft_letter"]
+      }
+    ]
+  }
+}

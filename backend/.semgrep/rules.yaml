@@ -1,0 +1,32 @@
+rules:
+  - id: hardcoded-google-api-key
+    patterns:
+      - pattern-regex: "AIzaSy[A-Za-z0-9_\\-]*"
+    message: "Hardcoded Google API key detected. Move to environment variable via os.environ.get('GEMINI_API_KEY')"
+    languages: [python]
+    severity: ERROR
+
+  - id: pii-in-gemini-prompt
+    patterns:
+      - pattern-either:
+          - pattern: $X.generate_content(..., $ARG, ...)
+          - pattern: $X.generate_content_stream(..., $ARG, ...)
+          - pattern: $X.generate_content_async(..., $ARG, ...)
+      - metavariable-regex:
+          metavariable: $ARG
+          regex: ".*(renter_name|landlord_name).*"
+    message: "PII detected in Gemini API call. Use {RENTER} and {LANDLORD} placeholders instead."
+    languages: [python]
+    severity: ERROR
+
+  - id: shell-execution-in-tool
+    patterns:
+      - pattern-either:
+          - pattern: subprocess.$FUNC(...)
+          - pattern: os.system(...)
+    paths:
+      include:
+        - "**/app/tools/**"
+    message: "Shell execution in tool file is forbidden unless approved in hooks.json."
+    languages: [python]
+    severity: ERROR
